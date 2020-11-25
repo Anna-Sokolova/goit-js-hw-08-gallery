@@ -76,7 +76,7 @@ function onGalleryClick(event) {
   // Закрытие модального окна по нажатию клавиши ESC
   window.addEventListener("keydown", onPressEscape);
   //Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
-  window.addEventListener("keydown", flippingImages);
+  //   window.addEventListener("keydown", flippingImages);
 }
 
 // функция для подмены src с превью на большое изображение
