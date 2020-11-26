@@ -1,4 +1,5 @@
 import images from "./gallery-items.js";
+// console.log(images); - это мой массив картинок!
 
 // ---1--- Создание и рендер разметки по массиву данных и предоставленному шаблону.
 
@@ -13,11 +14,12 @@ const closeBtnRef = document.querySelector(
   'button[data-action="close-lightbox"]'
 );
 const imagesMarkup = createGalleryItemsMarkup(images);
+let indexImage = 0; // задаем начальное значение индекса в глобальной переменной
 
 //1 Функция для создания одного элемента изображения
 function createGalleryItemsMarkup(images) {
   return images
-    .map(({ preview, original, description, index }) => {
+    .map(({ preview, original, description }, index) => {
       return `
         <li class="gallery__item">
         <a
@@ -63,20 +65,24 @@ function onGalleryClick(event) {
     return;
   }
   // получение url большого изображения
-  const LargeImageUrl = event.target.dataset.source;
+  const largeImageUrl = event.target.dataset.source;
 
   //подмена src с превью на большое изображение вариант 1
-  //   lagreImage.setAttribute("src", LargeImageUrl);
+  //   lagreImage.setAttribute("src", largeImageUrl);
   // ИЛИ вариант 2
   //вынесли в отдельную функцию подмену src image и вызываем эту функцию
-  setLargeImageSrc(LargeImageUrl);
+  setLargeImageSrc(largeImageUrl);
+
+  //получение индекса большого изображения при открытии модального окна
+  indexImage = Number(event.target.dataset.index);
 
   // Открытие модального окна по клику на элементе галереи.
   openModalImage.classList.add("is-open");
+
   // Закрытие модального окна по нажатию клавиши ESC
   window.addEventListener("keydown", onPressEscape);
   //Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
-  //   window.addEventListener("keydown", flippingImages);
+  window.addEventListener("keydown", flippingImages);
 }
 
 // функция для подмены src с превью на большое изображение
@@ -89,6 +95,7 @@ function closeModalImage() {
   openModalImage.classList.remove("is-open");
   lagreImage.src = "";
   window.removeEventListener("keydown", onPressEscape);
+  window.removeEventListener("keydown", flippingImages);
 }
 
 //Функция для закрытия модального окна по ESC
@@ -99,15 +106,18 @@ function onPressEscape(event) {
 }
 
 //Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
-// function flippingImages(event) {
-//   //получение индекса большого изображения
-//     const indexImage = Number(lagreImage.dataset.index);
-
-//   if (event.code === "ArrowRight") {
-//     lagreImage.index = indexImage + 1;
-//   } else if (event.code === "ArrowLeft") {
-//     lagreImage.index = indexImage - 1;
-//   }
-// }
-
-//   flippingImages(indexImage);
+function flippingImages(event) {
+  if (event.code === "ArrowRight") {
+    indexImage += 1;
+    if (indexImage >= images.length) {
+      indexImage = 0;
+    }
+    lagreImage.src = images[indexImage].original;
+  } else if (event.code === "ArrowLeft") {
+    indexImage -= 1;
+    if (indexImage < 0) {
+      indexImage = images.length - 1;
+    }
+    lagreImage.src = images[indexImage].original;
+  }
+}
